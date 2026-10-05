@@ -240,6 +240,39 @@ button{font-family:inherit;color:inherit;touch-action:manipulation;cursor:pointe
 @keyframes rise{from{transform:scaleY(0);transform-origin:bottom}to{transform:scaleY(1);transform-origin:bottom}}
 .pd.p1 .b{background:#D29B3A;height:44vh;animation-delay:.9s}.pd.p2 .b{background:#8E9AA6;height:32vh;animation-delay:.45s}.pd.p3 .b{background:#B98363;height:24vh}
 .pd.p1 .n,.pd.p1 .t{animation:tin .5s 1.6s both}.pd.p2 .n,.pd.p2 .t{animation:tin .5s 1.1s both}.pd.p3 .n,.pd.p3 .t{animation:tin .5s .6s both}
+.board{overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+.rowx .nm{flex:1;min-width:0;width:auto}
+.rowx .br{flex:none;width:22%}
+.board.nobar .rowx .br{display:none}
+.rowx .tg{flex:none;font-size:calc(var(--rh)*.24);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.rowx.fail{opacity:.62}.rowx.fail .tg{color:var(--bad)}.rowx.fail .br i{background:var(--bad)}
+.rowx.done .tg{color:var(--ok)}
+.h-tabs{display:flex;gap:8px;justify-content:center;margin-bottom:2vh}
+.h-tabs button{height:clamp(40px,5vh,54px);padding:0 24px;border-radius:16px;border:1px solid var(--line2);background:transparent;color:var(--ink);font-size:clamp(14px,1.2vw,19px);font-weight:800}
+.h-tabs button.on{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.h-tw{flex:1;min-height:0;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:20px}
+.h-table{width:100%;border-collapse:collapse;font-size:clamp(14px,1.15vw,20px)}
+.h-table th{position:sticky;top:0;background:var(--card);text-align:left;font-size:clamp(11px,.85vw,14px);font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:14px 18px;border-bottom:1px solid var(--line2)}
+.h-table td{padding:11px 18px;border-bottom:1px solid var(--line);color:var(--ink2);font-weight:600}
+.h-table td.n{color:var(--ink);font-weight:800}
+.h-table .r{text-align:right;font-variant-numeric:tabular-nums}
+.h-table td.p{font-family:var(--serif);font-weight:600;color:var(--muted);width:3.5em}
+.h-table tr.t1 td.p{color:#D29B3A}
+.h-table td.f{color:var(--bad)}
+#hprint{display:none}
+@media print{
+  @page{size:A4 portrait;margin:14mm}
+  html,body{background:#fff!important}
+  #app,#host{display:none!important}
+  #hprint{display:block;color:#000;font-family:Arial,Helvetica,sans-serif}
+  #hprint h1{font-size:18pt;margin:0 0 2mm}
+  #hprint p{font-size:9.5pt;color:#555;margin:0 0 6mm}
+  #hprint table{width:100%;border-collapse:collapse;font-size:9.5pt}
+  #hprint th{text-align:left;font-size:8pt;text-transform:uppercase;letter-spacing:.06em;color:#555;border-bottom:1.5pt solid #000;padding:2mm 2mm}
+  #hprint td{border-bottom:.5pt solid #bbb;padding:1.8mm 2mm}
+  #hprint .r{text-align:right}
+  #hprint tr{break-inside:avoid}
+}
 .facts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 .facts div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 18px;font-size:clamp(13px,1.1vw,18px);color:var(--ink2);font-weight:600}
 .facts b{color:var(--ink)}
@@ -982,7 +1015,7 @@ if(HOST){
   const stEl=document.createElement('div');stEl.className='h-code';stEl.style.cssText='font-size:12px;letter-spacing:.06em;text-transform:none';$('hjoin').appendChild(stEl);
   setInterval(()=>{const n=window.__net,age=Date.now()-n.last;stEl.innerHTML=n.err&&age>5000?'<span style="color:#D2604E">● Keine Verbindung zur Datenbank – Netzwerk/Firewall prüfen</span>':n.live?'<span style="color:#6E9F78">● Live verbunden</span>':age<5000?'<span style="color:#D29B3A">● Verbunden (Abfrage-Modus)</span>':'<span style="color:#A39B8C">● Verbinde …</span>';},1000);
   try{const q=qrcode(0,'M');q.addData(joinUrl);q.make();const n=q.getModuleCount(),c=document.createElement('canvas'),sz=8,pad=2;c.width=c.height=(n+pad*2)*sz;const g=c.getContext('2d');g.fillStyle='#FBF8F2';g.fillRect(0,0,c.width,c.height);g.fillStyle='#2B2A28';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))g.fillRect((k+pad)*sz,(r+pad)*sz,sz,sz);$('hqr').appendChild(c);}catch(e){$('hqr').textContent='QR nicht verfügbar';}
-  let room={},view='',startedAt=0,autoDone=false;
+  let room={},view='',startedAt=0,autoDone=false,doneRound=-1,doneTab='pod',bOrder=[],bT=0;
   api('rooms/'+code,'GET').then(d=>{if(!d||!d.state)return api('rooms/'+code,'PATCH',{state:'lobby',round:0,seed:Math.floor(Math.random()*1e9),created:SV});}).catch(()=>{$('hbig').textContent='Keine Verbindung zur Datenbank';});
   stream('rooms/'+code,d=>{room=d||{};render();});
   const players=()=>Object.entries(room.players||{}).map(([id,p])=>({id,...p}));
@@ -991,7 +1024,7 @@ if(HOST){
   function endRound(){api('rooms/'+code,'PATCH',{state:'done'});}
   function render(){
     const st=room.state||'lobby',ps=players();
-    $('hjoin').style.display=st==='done'?'none':'flex';
+    $('hjoin').style.display=st==='lobby'?'flex':'none';
     if(st==='lobby'){
       $('hstate').firstChild.nodeValue='Lobby';$('hbig').textContent=ps.length?ps.length+' im Raum':'Warte auf Mitspieler';
       if(view!=='lobby'){view='lobby';main.innerHTML=`<div class="h-lbl"><span>Scannen, Spitznamen eingeben, loslegen</span><span id="hcnt"></span></div><div class="h-chips" id="hchips"></div><div class="h-row"><button class="h-btn" id="hstart" type="button">Runde starten</button></div>`;$('hstart').onclick=startRound;}
@@ -1010,36 +1043,60 @@ if(HOST){
     else if(st==='done'){
       const cur=ps.filter(p=>p.r===room.round).sort((a,b)=>(b.score||0)-(a.score||0));
       $('hstate').firstChild.nodeValue='Runde '+room.round+' · Ergebnis';$('hbig').textContent=cur.length+' Teilnehmende';
-      const key='done'+room.round+'|'+cur.map(p=>p.id+p.score).join(',');
+      if(doneRound!==room.round){doneRound=room.round;doneTab='pod';sound('ach');}
+      const key='done'+room.round+'|'+doneTab+'|'+cur.map(p=>p.id+p.score).join(',');
       if(view!==key){view=key;
-        const pd=(p,i)=>p?`<div class="pd p${i}"><div class="n">${esc(p.name)}</div><div class="t">${esc(p.rank||'')}</div><div class="b"><span>${i}</span><small>${fmt(p.score||0)} P.</small></div></div>`:'';
-        const most=(f)=>cur.slice().sort((a,b)=>(b[f]||0)-(a[f]||0))[0];
-        const bo=cur.filter(p=>p.failed).length,mwTop=most('mw'),conTop=most('conn');
-        main.innerHTML=`<div class="podium">${pd(cur[1],2)}${pd(cur[0],1)}${pd(cur[2],3)}</div>
-        <div class="facts">${mwTop?`<div>Meiste Leistung: <b>${esc(mwTop.name)}</b> · ${fmt(mwTop.mw||0)} MW</div>`:''}${conTop?`<div>Meiste Anschlüsse: <b>${esc(conTop.name)}</b> · ${conTop.conn||0}</div>`:''}<div>Vorzeitig ausgeschieden: <b>${bo} von ${cur.length}</b></div></div>
-        <div class="h-row" style="justify-content:center"><button class="h-btn" id="hagain" type="button">Nächste Runde</button><button class="h-btn ghost" id="hlobby" type="button">Zur Lobby</button></div>`;
+        const tabs=`<div class="h-tabs"><button type="button" data-t="pod" class="${doneTab==='pod'?'on':''}">Siegertreppchen</button><button type="button" data-t="tab" class="${doneTab==='tab'?'on':''}">Gesamttabelle</button></div>`;
+        const btns=`<div class="h-row" style="justify-content:center"><button class="h-btn" id="hagain" type="button">Nächste Runde</button><button class="h-btn ghost" id="hlobby" type="button">Zur Lobby</button>${doneTab==='tab'?'<button class="h-btn ghost" id="hpdf" type="button">Als PDF speichern</button>':''}</div>`;
+        if(doneTab==='pod'){
+          const pd=(p,i)=>p?`<div class="pd p${i}"><div class="n">${esc(p.name)}</div><div class="t">${esc(p.rank||'')}</div><div class="b"><span>${i}</span><small>${fmt(p.score||0)} P.</small></div></div>`:'';
+          const most=(f)=>cur.slice().sort((a,b)=>(b[f]||0)-(a[f]||0))[0];
+          const bo=cur.filter(p=>p.failed).length,mwTop=most('mw'),conTop=most('conn');
+          main.innerHTML=tabs+`<div class="podium">${pd(cur[1],2)}${pd(cur[0],1)}${pd(cur[2],3)}</div>
+          <div class="facts">${mwTop?`<div>Meiste Leistung: <b>${esc(mwTop.name)}</b> · ${fmt(mwTop.mw||0)} MW</div>`:''}${conTop?`<div>Meiste Anschlüsse: <b>${esc(conTop.name)}</b> · ${conTop.conn||0}</div>`:''}<div>Vorzeitig ausgeschieden: <b>${bo} von ${cur.length}</b></div></div>`+btns;
+        }else{
+          main.innerHTML=tabs+`<div class="h-tw">${resultTable(cur,'h-table')}</div>`+btns;
+          $('hpdf').onclick=()=>printResult(cur,room.round);
+        }
+        main.querySelectorAll('.h-tabs button').forEach(b=>b.onclick=()=>{doneTab=b.dataset.t;render();});
         $('hagain').onclick=startRound;$('hlobby').onclick=()=>api('rooms/'+code,'PATCH',{state:'lobby'});
-        sound('ach');
       }
     }
   }
+  function resultTable(cur,cls){
+    const rows=cur.map((p,i)=>`<tr class="${i===0?'t1':''}"><td class="p">${i+1}</td><td class="n">${esc(p.name)}</td><td class="r"><b>${fmt(p.score||0)}</b></td><td class="${p.failed?'f':''}">${esc(p.rank||(p.done?'':'nicht beendet'))}</td><td class="r">${fmt(p.mw||0)} MW</td><td class="r">${p.conn||0}</td><td class="r">${p.sat!=null?Math.round(p.sat)+' %':'–'}</td></tr>`).join('');
+    return `<table class="${cls}"><thead><tr><th>Platz</th><th>Name</th><th class="r">Punkte</th><th>Titel</th><th class="r">Leistung</th><th class="r">Anschlüsse</th><th class="r">Zufriedenheit</th></tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  function printResult(cur,round){
+    let el=$('hprint');if(!el){el=document.createElement('div');el.id='hprint';document.body.appendChild(el);}
+    const d=new Date(),ds=d.toLocaleDateString('de-DE')+', '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    const bo=cur.filter(p=>p.failed).length;
+    el.innerHTML=`<h1>Netzanschluss Rush – Ergebnis Runde ${round}</h1><p>${ds} · Raum ${esc(code)} · ${cur.length} Teilnehmende · ${bo} vorzeitig ausgeschieden</p>`+resultTable(cur,'');
+    window.print();
+  }
   function board(list){
     const el=$('hboard');if(!el)return;
-    const sorted=list.slice().sort((a,b)=>(b.score||0)-(a.score||0));
-    const H=el.clientHeight,n=sorted.length,cols=n>10?2:1,perCol=Math.ceil(n/cols)||1,gap=10;
-    const rh=Math.max(38,Math.min(74,(H-gap*(perCol-1))/perCol));const W=el.clientWidth,cw=(W-(cols-1)*20)/cols;
+    let sorted=list.slice().sort((a,b)=>(b.score||0)-(a.score||0));
+    // Reihenfolge nur alle 1,5 s neu sortieren, damit es auf dem Beamer ruhig bleibt
+    const now=performance.now(),ids=sorted.map(p=>p.id);
+    if(now-bT<1500&&bOrder.length===ids.length&&ids.every(id=>bOrder.includes(id))){const pos={};bOrder.forEach((id,i)=>pos[id]=i);sorted.sort((a,b)=>pos[a.id]-pos[b.id]);}
+    else{bOrder=ids;bT=now;}
+    const W=el.clientWidth,H=el.clientHeight,n=sorted.length,gap=10;
+    const cols=(n>10&&W>=1100)?2:1,perCol=Math.ceil(n/cols)||1,vis=Math.min(perCol,10);
+    const rh=Math.max(44,Math.min(74,(H-gap*(vis-1))/vis)),cw=(W-(cols-1)*24)/cols;
+    el.classList.toggle('nobar',cw<620);
     const max=Math.max(1,...sorted.map(p=>p.score||0));
     const have={};[...el.children].forEach(c=>have[c.dataset.id]=c);
     sorted.forEach((p,i)=>{
-      let r=have[p.id];if(!r){r=document.createElement('div');r.className='rowx';r.dataset.id=p.id;r.innerHTML='<span class="rk"></span><span class="nm"></span><span class="br"><i></i></span><span class="sc"></span><span class="fl"></span>';r.style.opacity=0;el.appendChild(r);requestAnimationFrame(()=>r.style.opacity=1);}
+      let r=have[p.id];if(!r){r=document.createElement('div');r.className='rowx';r.dataset.id=p.id;r.innerHTML='<span class="rk"></span><span class="nm"></span><span class="tg"></span><span class="br"><i></i></span><span class="sc"></span>';r.style.opacity=0;el.appendChild(r);requestAnimationFrame(()=>r.style.opacity='');}
       delete have[p.id];
       const col=Math.floor(i/perCol),row=i%perCol;
-      r.style.setProperty('--rh',rh+'px');r.style.width=cw+'px';r.style.transform=`translate(${col*(cw+20)}px,${row*(rh+gap)}px)`;
+      r.style.setProperty('--rh',rh+'px');r.style.width=cw+'px';r.style.transform=`translate(${col*(cw+24)}px,${row*(rh+gap)}px)`;
       r.className='rowx'+(i===0&&(p.score||0)>0?' top1':'')+(p.failed?' fail':p.done?' done':'');
-      r.querySelector('.rk').textContent=i+1;r.querySelector('.nm').textContent=p.name;
+      r.querySelector('.rk').textContent=i+1;r.querySelector('.nm').textContent=p.name;r.title=p.name;
+      r.querySelector('.tg').textContent=p.failed?'raus':p.done?'✓':'';
       r.querySelector('.br i').style.width=Math.max(2,(p.score||0)/max*100)+'%';
       r.querySelector('.sc').textContent=fmt(p.score||0);
-      r.querySelector('.fl').textContent=p.failed?'raus':p.done?'fertig':p.ph==='tut'?'Einarbeitung':p.ph==='break'?'Pause':(p.t!=null?Math.max(0,180-p.t)+' s':'startet');
     });
     Object.values(have).forEach(c=>c.remove());
   }
