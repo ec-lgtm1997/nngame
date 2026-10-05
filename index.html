@@ -273,6 +273,43 @@ button{font-family:inherit;color:inherit;touch-action:manipulation;cursor:pointe
   #hprint .r{text-align:right}
   #hprint tr{break-inside:avoid}
 }
+.stage{margin:0 -8px}
+.year{font-size:22px}
+.head{gap:8px}
+.snd{width:26px;height:26px}
+.wave b{font-size:13px}
+.budget{padding:0 3px 0 11px;gap:7px}
+.capb{height:28px;border:0;border-radius:14px;background:var(--warn);color:#3B2A0A;font-weight:800;font-size:12px;padding:0 6px 0 9px;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:background .2s}
+.capb i{font-style:normal;background:rgba(255,255,255,.6);border-radius:8px;min-width:18px;padding:0 4px;font-size:11px;line-height:17px;text-align:center}
+.capb.ask{background:var(--acc);color:#fff}.capb.ask i{color:var(--ink)}
+.capb.none{opacity:.35}
+.capb.pulse{animation:cpulse 1.1s ease-in-out infinite}
+@keyframes cpulse{0%,100%{box-shadow:0 0 0 0 rgba(210,155,58,0)}50%{box-shadow:0 0 0 5px rgba(210,155,58,.45)}}
+.meters{gap:6px}
+.m{padding:6px 9px 6px;border-radius:12px}
+.m small{font-size:8px}
+.m b{font-size:17px;line-height:1.2}
+.m b span{font-size:10px}
+.pcard{height:58px;padding:0 8px 0 10px;gap:10px;border-radius:16px}
+.pcard .ic,.pcard .ic canvas,.pcard .ic img{width:34px;height:34px}
+.pcard b{font-family:var(--sans);font-weight:800;font-size:15px}
+.pcard .sl{display:block;font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink2);margin-top:1px}
+.pcard .sl .bd{display:inline-block;padding:0 6px;border-radius:7px;font-size:10.5px;letter-spacing:.03em;margin-right:5px;background:#DCE8DD;color:#3E6B48}
+.pcard .sl .bd.t{background:#E7C77E;color:#5E4512}
+.pcard .rej{width:34px;height:34px}
+.tool{height:56px;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;align-content:center;justify-items:start;padding:0 14px;text-align:left;border-radius:16px}
+.tool svg{grid-row:1/3;margin:0;width:24px;height:24px;align-self:center}
+.tool small{display:none}
+.tool b{font-size:13.5px;line-height:1.2}
+.tool em{font-size:11px;line-height:1.2;white-space:nowrap}
+.tool b{white-space:nowrap}
+.tool{padding:0 10px}
+@media (max-height:720px){.tool{height:50px}.pcard{height:54px}}
+.coach p{font-size:15px}
+.steps.short li{grid-template-columns:30px 1fr;font-size:15px}
+.in-stats{grid-template-columns:1fr 1fr 1fr}
+.in-stats b{font-size:18px}
+.in-ne{padding:9px 12px;font-size:13.5px}
 .facts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 .facts div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 18px;font-size:clamp(13px,1.1vw,18px);color:var(--ink2);font-weight:600}
 .facts b{color:var(--ink)}
@@ -284,7 +321,7 @@ button{font-family:inherit;color:inherit;touch-action:manipulation;cursor:pointe
     <div class="year" id="year">2026</div>
     <div class="wave"><small id="wlabel">Welle 1 von 3 · 2:00</small><b id="wname">Wärmewende</b><div class="wbar"><i id="wbar"></i></div></div>
     <button class="snd" id="snd" type="button" aria-label="Ton an oder aus"><svg viewBox="0 0 24 24" fill="none" stroke="#2B2A28" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></button>
-    <div class="budget" id="budget"><small style="font-weight:600;opacity:.6;margin-right:5px;font-size:10px">Bilanz</small><span id="bval">60 Mio €</span></div>
+    <div class="budget" id="budget"><span id="bval">60 Mio €</span><button class="capb" id="capb" type="button" aria-label="Kapital aufnehmen">+ Kapital <i id="capn">3</i></button></div>
   </div>
   <div class="meters">
     <div class="m" id="m-ne"><small>Netzentgelt <span class="soon" id="ne-soon">· ab 2028</span></small><b><i id="ne" style="font-style:normal">6,80</i><span>ct/kWh</span><em id="netr"></em></b><div class="bar"><i id="nebar"></i></div></div>
@@ -300,19 +337,18 @@ button{font-family:inherit;color:inherit;touch-action:manipulation;cursor:pointe
   </div>
   <div class="pcard empty" id="pcard">Petenten erscheinen gleich auf der Karte.</div>
   <div class="tools">
-    <button class="tool" id="t-trafo" type="button"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="2.5"/><path d="M8.5 7V4M15.5 7V4M12.5 9.5l-2.5 3.5h3.5l-2 3.5"/></svg><b>Trafo ausbauen</b><small>+200 MW an einem UW</small><em>10 Mio €</em></button>
-    <button class="tool" id="t-uw" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></svg><b>Neues Umspannwerk</b><small>300 MW · Ort frei wählbar</small><em>24 Mio €</em></button>
+    <button class="tool" id="t-trafo" type="button"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="12" rx="2.5"/><path d="M8.5 7V4M15.5 7V4M12.5 9.5l-2.5 3.5h3.5l-2 3.5"/></svg><b>Trafo ausbauen</b><small>+200 MW an einem UW</small><em>10 Mio € · +200 MW</em></button>
+    <button class="tool" id="t-uw" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="2.2" fill="currentColor"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></svg><b>Neues UW</b><small>300 MW · Ort frei wählbar</small><em>24 Mio € · 300 MW</em></button>
   </div>
 
   <section class="ov" id="start">
     <p class="eyebrow">Netzwirtschaft · Das Spiel</p>
     <h1>Netzanschluss <em>Rush</em></h1>
-    <p>Rechenzentren, Speicher, Wärmepumpen: Alle wollen ans Netz – und zwar sofort. Nach einer kurzen Einarbeitung warten drei Wellen – etwa vier Minuten.</p>
-    <ul class="steps">
-      <li><i>1</i><span><b>Zieh Petenten zu einem Umspannwerk.</b> Der Ring zeigt, wie viel Kapazität noch frei ist. Warte nicht zu lange – die Geduld läuft ab.</span></li>
-      <li><i>2</i><span><b>Rechne mit:</b> Jeder Anschluss kostet Leitung und Technik, der Petent zahlt Baukostenzuschuss. Der Saldo landet in deiner Bilanz.</span></li>
-      <li><i>3</i><span><b>Bau aus, wenn es eng wird:</b> Trafo oder neues Umspannwerk – bezahlt aus der Bilanz.</span></li>
-      <li><i>4</i><span><b>Behalte das Netzentgelt im Blick.</b> Jede Investition treibt es nach oben, neue Abnehmer verteilen die Kosten.</span></li>
+    <p>Alle wollen ans Netz – und zwar sofort. Drei Wellen, rund vier Minuten.</p>
+    <ul class="steps short">
+      <li><i>1</i><span><b>Ziehen:</b> Petent zu einem Umspannwerk. Die Zahl im Kreis = freie MW.</span></li>
+      <li><i>2</i><span><b>Rechnen:</b> Baukostenzuschuss minus Anschlusskosten landet in deiner Bilanz.</span></li>
+      <li><i>3</i><span><b>Ausbauen:</b> Wird es eng – Trafo oder neues Umspannwerk. Kostet Geld und Netzentgelt.</span></li>
     </ul>
     <div class="types" id="types"></div>
     <button class="go" id="go" type="button">Spiel starten</button>
@@ -332,10 +368,10 @@ button{font-family:inherit;color:inherit;touch-action:manipulation;cursor:pointe
     <h1 id="wtitle">Du bist dabei.</h1>
     <p id="wtext">Die Runde startet gleich auf dem Beamer <span class="dot3"><i></i><i></i><i></i></span></p>
     <div class="who" id="wwho"></div>
-    <ul class="steps">
-      <li><i>1</i><span><b>Zieh Petenten zu einem Umspannwerk.</b> Der Ring zeigt die freie Kapazität.</span></li>
-      <li><i>2</i><span><b>Rechne mit:</b> Baukostenzuschuss minus Anschlusskosten = Saldo für deine Bilanz.</span></li>
-      <li><i>3</i><span><b>Netzentgelt im Blick behalten.</b> Alle spielen dasselbe Szenario.</span></li>
+    <ul class="steps short">
+      <li><i>1</i><span><b>Ziehen:</b> Petent zu einem Umspannwerk mit genug freien MW.</span></li>
+      <li><i>2</i><span><b>Rechnen:</b> Der Saldo landet in deiner Bilanz.</span></li>
+      <li><i>3</i><span><b>Ausbauen,</b> wenn es eng wird. Alle spielen dasselbe Szenario.</span></li>
     </ul>
   </section>
   <section class="ov center" id="cd" hidden><div class="cdnum" id="cdn">3</div></section>
@@ -433,7 +469,7 @@ const WAVES=[
 ];
 const DUR=180,PAT_MUL=1.5,MAXD=270,LINE_COST=.028,MW_COST=.015;
 const connCost=(p,u)=>Math.round((Math.hypot(p.x-u.x,p.y-u.y)*LINE_COST+p.mw*MW_COST)*(p.cf||1)*10)/10;
-const CAP_INJ={eur:30,ne:.4,pts:150};
+const CAP_INJ={eur:30,ne:.4,pts:150},CAP_MAX=3;
 const EE={goal:{1:400,2:560},pts:100,rej:4,mul:.5};
 const eeMW=()=>Math.max(0,Math.round(S.mwGen-(S.gen0||0)));
 const sgnM=v=>(v>=0?'+':'−')+fmt(Math.abs(v),Math.abs(v)%1?1:0);
@@ -467,6 +503,7 @@ function updateNE(snap){
 function makeP(type,x,y,mw,bkz,o={}){
   const T=TYPES[type];
   const p={id:++S.pid,type,x,y,mw,bkz,pat:o.pat||T.pat*PAT_MUL,patMax:o.pat||T.pat*PAT_MUL,state:'wait',uw:null,born:S.clk,a:0,name:o.name||pick(T.names),q:o.q||pick(T.q),nd:!!o.nd,cf:o.cf||1,cfl:o.cfl||'',top:!!o.top,line:0,shake:0,tut:!!o.tut};
+  if(T.gen&&S.phase==='wave')hintOnce('ee','Erneuerbare: kein Baukostenzuschuss – aber Vorrang nach EEG und Bonuspunkte.',3.2);
   S.ps.push(p);sound('spawn');return p;
 }
 function spawn(){
@@ -504,7 +541,7 @@ function tryConnect(p,u,dry){
   const cost=connCost(p,u),saldo=Math.round((p.bkz-cost)*10)/10;
   if(dry)return{ok:true,why:'passt · Saldo '+sgnM(saldo)+' Mio €',cost,saldo};
   // connect
-  p.state='conn';p.uw=u.id;p.line=0;p.ct=S.t;
+  p.state='conn';p.uw=u.id;p.line=0;p.ct=S.t;p.cc=S.clk;
   u.used+=need;if(p.nd){u.cap+=Math.round(p.mw*.3);}
   u.pop=1;
   S.budget+=p.bkz-cost;S.bkzSum+=p.bkz;S.costSum=(S.costSum||0)+cost;
@@ -528,7 +565,7 @@ function reject(p){if(!p||p.state!=='wait')return;const ee=TYPES[p.type].gen&&S.
 function expire(p){p.state='gone';p.gone='exp';p.a=1;S.sat=clamp(S.sat-(p.type==='rz'?10:6),0,100);S.lost++;float(p.x,p.y-26,'zieht weiter …',C.bad);if(S.sel===p)S.sel=null;sound('expire');buzz([30,40,30]);S.combo=0;}
 function useTool(kind,u,pos){
   const tl=TOOLS[kind];
-  if(S.budget<tl.cost){hintOnce('money','Bilanz reicht nicht – erst Projekte mit positivem Saldo anschließen.',2.4);shakeTool(kind);return false;}
+  if(S.budget<tl.cost){hintOnce('money','Bilanz reicht nicht – Projekte mit positivem Saldo anschließen oder oben „+ Kapital“.',2.6);shakeTool(kind);return false;}
   if(kind==='trafo'){if(!u)return false;if(u.build>0){hint('Hier wird schon gebaut.',1.5);return false;}u.build=5;u.buildMax=5;u.buildAdd=200;}
   if(kind==='uw'){
     if(!pos||!inside(pos[0],pos[1])){hint('Bitte innerhalb von Baden-Württemberg setzen.',1.6);return false;}
@@ -579,16 +616,12 @@ function withdraw(p){const u=S.uws[p.uw];p.state='gone';p.gone='wd';p.a=1;if(u){
 
 /* ---------- Einarbeitung ---------- */
 const TUT=[
-  {text:'Ein Wärmepumpen-Quartier möchte ans Netz. <b>Zieh es mit dem Finger zu einem Umspannwerk.</b>',
+  {text:'<b>Zieh das Quartier zu einem Umspannwerk.</b> Die Zahl im Kreis = freie MW.',
    make:()=>makeP('wp',455,255,30,2.4,{pat:999,tut:true,name:'Quartier Am Sonnenhang'})},
-  {text:'Die Zahlen zeigen die <b>freien MW</b>. Neckarbogen ist fast voll – zieh die Gießerei zu einem anderen Umspannwerk.',
-   make:()=>makeP('ind',470,625,160,6.5,{pat:999,tut:true,name:'Gießerei Hardt'})},
-  {text:'Kein Umspannwerk in Reichweite hat 280 MW frei. <b>Tippe auf „Trafo ausbauen“ und dann auf ein Umspannwerk.</b>',
+  {text:'280 MW – so viel ist nirgends frei. <b>Tippe „Trafo ausbauen“, dann auf ein Umspannwerk.</b>',
    make:()=>makeP('rz',690,430,280,20,{pat:999,tut:true,name:'CloudCastle Süd'}),unlock:'trafo'},
-  {text:'Dieser Windpark ist zu weit von jedem Umspannwerk entfernt. <b>Tippe auf „Neues Umspannwerk“ und setze es in die Nähe.</b>',
-   make:()=>{const f=farSpot();return f?makeP('wind',f[0],f[1],90,0,{pat:999,tut:true,name:'Windpark Waldblick'}):null;},unlock:'uw'},
-  {text:'Ein PV-Park zahlt als Einspeiser <b>keinen Baukostenzuschuss</b> – der Saldo wäre negativ. Dafür haben Erneuerbare <b>Vorrang nach EEG</b> und zählen am Ende 1,5-fach. Anschließen oder mit <b>✕</b> ablehnen?',
-   make:()=>makeP('pv',720,925,60,0,{pat:999,tut:true,name:'Solarpark Rebhang'})}
+  {text:'Der Windpark ist zu weit weg. <b>Tippe „Neues UW“ und setz es daneben.</b>',
+   make:()=>{const f=farSpot();return f?makeP('wind',f[0],f[1],90,0,{pat:999,tut:true,name:'Windpark Waldblick'}):null;},unlock:'uw'}
 ];
 function farSpot(){let best=null,bd=MAXD+8;for(let x=20;x<990;x+=10)for(let y=25;y<1130;y+=10){if(!inside(x,y))continue;const m=Math.min(...S.uws.map(u=>Math.hypot(u.x-x,u.y-y)));if(m>bd){bd=m;best=[x,y];}}return best;}
 function coach(txt,stepLbl){const c=$('coach');if(!txt){c.hidden=true;return;}c.hidden=false;const top=S.tutP&&S.tutP.y>700;c.style.top=top?'4px':'auto';c.style.bottom=top?'auto':'4px';$('ch-step').textContent=stepLbl||'';$('ch-text').innerHTML=txt;c.style.animation='none';void c.offsetWidth;c.style.animation='';}
@@ -608,8 +641,8 @@ function tutTick(dt){
   if(p&&p.state!=='wait'){S.tutWait=.9;['trafo','uw'].forEach(t=>$('t-'+t).classList.remove('pulse'));
     coach(p.state==='conn'?'Sehr gut! ✓':'Abgelehnt – auch das ist eine Entscheidung. ✓','Einarbeitung '+(S.tutStep+1)+'/'+TUT.length);}
 }
-function tutBuilt(kind){if(kind==='trafo')coach('Der Trafo wird gebaut (+200 MW). Sobald er fertig ist, <b>zieh das Rechenzentrum dorthin.</b>','Einarbeitung 3/5');
-  if(kind==='uw')coach('Das Umspannwerk wird gebaut. Danach <b>zieh den Windpark dorthin.</b> Windparks bringen keinen Baukostenzuschuss, aber Megawatt für die Energiewende.','Einarbeitung 4/5');}
+function tutBuilt(kind){const l='Einarbeitung '+(S.tutStep+1)+'/'+TUT.length;if(kind==='trafo')coach('Trafo im Bau (+200 MW). <b>Danach das Rechenzentrum dorthin ziehen.</b>',l);
+  if(kind==='uw')coach('Umspannwerk im Bau. <b>Danach den Windpark anschließen.</b>',l);}
 function endTut(){
   S.unlock={trafo:true,uw:true};['trafo','uw'].forEach(t=>$('t-'+t).classList.remove('lock','pulse'));coach('');
   S.ps=S.ps.filter(p=>p.state!=='wait');S.tutDone=true;S.started=true;
@@ -628,9 +661,9 @@ function skipTut(){
 
 /* ---------- Zwischenbilanz / Wellenstart ---------- */
 const NEXT_TXT=[
-  'Jetzt läuft die Uhr: Petenten warten nicht ewig – <strong>der Ring zeigt ihre Geduld</strong>. Höchstens zwei kommen gleichzeitig.',
-  'Ab jetzt zählt das <strong>Netzentgelt</strong>: Jede Investition treibt es nach oben, neue Abnehmer verteilen die Kosten. Über 10,5 ct/kWh greift die Regulierungsbehörde ein.',
-  'Neu: <strong>Reservierung</strong>. Deine Zusage reserviert zunächst nur Kapazität (gestrichelte Leitung). Manche Petenten ziehen vor der Inbetriebnahme zurück – dann wird die Kapazität wieder frei.'];
+  'Der Ring zeigt die <strong>Geduld</strong> der Petenten. Geld knapp? Oben <strong>„+ Kapital“</strong> – höchstens 3×.',
+  'Ab jetzt zählt das <strong>Netzentgelt</strong>. Über 10,5 ct/kWh greift die Regulierungsbehörde ein.',
+  'Neu: <strong>Reservierungen</strong> (gestrichelt). Manche Petenten ziehen zurück – die MW werden wieder frei.'];
 function openBreak(w,first){
   S.phase='break';setTool(null);S.drag=null;hint('');
   const b=S.base||{mw:0,budget:S.budget,ne:S.ne,conn:0,lost:0,rej:0};
@@ -640,15 +673,15 @@ function openBreak(w,first){
     const prev=WAVES[w-1];
     $('in-eb').textContent='Zwischenbilanz · '+prev.y;$('in-h').textContent='Welle '+w+' geschafft';
     const dmw=S.mwTot-b.mw,dbud=S.budget-b.budget;
-    $('in-stats').innerHTML=`<div><small>Angeschlossen</small><b>+${fmt(Math.round(dmw))} MW</b></div><div><small>Saldo der Welle</small><b style="color:${dbud>=0?'var(--ok)':'var(--bad)'}">${sgnM(Math.round(dbud*10)/10)} Mio €</b></div><div><small>Abgelehnt</small><b>${S.rej-b.rej}</b></div><div><small>Verloren</small><b style="color:${S.lost-b.lost?'var(--bad)':'inherit'}">${S.lost-b.lost}</b></div>`;
+    $('in-stats').innerHTML=`<div><small>Angeschlossen</small><b>+${fmt(Math.round(dmw))} MW</b></div><div><small>Saldo der Welle</small><b style="color:${dbud>=0?'var(--ok)':'var(--bad)'}">${sgnM(Math.round(dbud*10)/10)} Mio €</b></div><div><small>Verloren</small><b style="color:${S.lost-b.lost?'var(--bad)':'inherit'}">${S.lost-b.lost}</b></div>`;
     const dne=S.neT-b.ne;
-    $('in-ne').innerHTML=w>=2?`<b>Netzentgelt-Abrechnung:</b> ${fmt(b.ne,2)} → <b>${fmt(S.neT,2)} ct/kWh</b>. ${dne>0.02?'Deine Investitionen landen über das Netzentgelt bei allen Kunden.':dne<-0.02?'Neue Abnehmer verteilen die Netzkosten auf mehr Schultern – gut für alle Kunden.':'Stabil – Investitionen und neue Abnehmer halten sich die Waage.'}`:'';
+    $('in-ne').innerHTML=w>=2?`<b>Netzentgelt:</b> ${fmt(b.ne,2)} → <b>${fmt(S.neT,2)} ct/kWh</b> ${dne>0.02?'↑':dne<-0.02?'↓':''}`:'';
   }
   renderGoal(first?-1:w);
-  renderCap(first?-1:w);
+  $('in-cap').innerHTML='';$('in-cap').className='in-cap';
   $('in-ach').innerHTML=S.achQ.map(t=>`<span>★ ${t}</span>`).join('');S.achQ=[];
   $('in-next').innerHTML=`<small>Als Nächstes · Welle ${w+1} von 3</small><b>${W1.y} · ${W1.name}</b>${NEXT_TXT[w]}`;
-  S.pendingWave=w;S.autoT=window.__mpTick?(first?9:12):25;
+  S.pendingWave=w;S.autoT=window.__mpTick?(first?9:12):14;
   $('in-go').textContent='Weiter zu '+W1.y;
   $('inter').hidden=false;$('coach').hidden=true;
   S.base={mw:S.mwTot,budget:S.budget,ne:S.neT,conn:S.conn,lost:S.lost,rej:S.rej};
@@ -659,8 +692,8 @@ function goalHTML(eyebrow,badge,ok,cur,tgt,txt){const q=clamp(cur/tgt,0,1),mk=cu
 function evalGoal(w){if(S.goals[w]!=null)return S.goals[w];const ok=eeMW()>=EE.goal[w];S.goals[w]=ok;if(S.goals[1]&&S.goals[2])ach('ee','Energiewende-Macher:in');return ok;}
 function renderGoal(w){
   const el=$('in-goal');
-  if(w===1){el.innerHTML=goalHTML('Ab 2028 · Ausbauziel EE','',true,eeMW(),EE.goal[1],`Bis Ende 2028: <strong>${fmt(EE.goal[1])} MW</strong> Wind und PV. Erreicht <strong>+${EE.pts}</strong>, verfehlt <strong>−${EE.pts}</strong> Punkte.`);return;}
-  if(w===2){const ok=evalGoal(1);el.innerHTML=goalHTML('Ausbauziel EE · 2028',ok?`✓ erreicht · +${EE.pts}`:`verfehlt · −${EE.pts}`,ok,eeMW(),EE.goal[1],`Nächstes Ziel <strong>2030: ${fmt(EE.goal[2])} MW</strong>. Wind und PV zahlen keinen Baukostenzuschuss – aber ohne sie kein Ziel.`);return;}
+  if(w===1){el.innerHTML=goalHTML('Ab 2028 · Ausbauziel EE','',true,eeMW(),EE.goal[1],`Bis Ende 2028 <strong>${fmt(EE.goal[1])} MW</strong> Wind und PV · ±${EE.pts} Punkte`);return;}
+  if(w===2){const ok=evalGoal(1);el.innerHTML=goalHTML('Ausbauziel EE · 2028',ok?`✓ erreicht · +${EE.pts}`:`verfehlt · −${EE.pts}`,ok,eeMW(),EE.goal[1],`Nächstes Ziel 2030: <strong>${fmt(EE.goal[2])} MW</strong>`);return;}
   el.innerHTML='';
 }
 function renderCap(w){
@@ -674,11 +707,21 @@ function renderCap(w){
   if(!done)$('cap-go').onclick=()=>{ac();takeCap();};
 }
 function takeCap(){
-  const w=S.pendingWave;if(S.phase!=='break'||w<1||S.capTaken[w])return false;
-  S.capTaken[w]=1;S.capInj++;S.budget+=CAP_INJ.eur;S.neAdd+=CAP_INJ.ne;updateNE();bumpBudget();sound('connect');
-  if(S.base)S.base.budget=S.budget;
-  renderCap(w);return true;
+  if(!S.running||S.over||S.phase==='tut'||S.capInj>=CAP_MAX)return false;
+  S.capInj++;S.budget+=CAP_INJ.eur;S.neAdd+=CAP_INJ.ne;updateNE();bumpBudget();sound('connect');buzz(25);
+  if(S.base)S.base.budget+=CAP_INJ.eur;
+  float(500,560,'+'+CAP_INJ.eur+' Mio €',C.ok,1.6);
+  hint('Kapital erhalten · Netzentgelt dauerhaft +'+fmt(CAP_INJ.ne,1)+' ct/kWh · −'+CAP_INJ.pts+' Punkte',2.6);
+  return true;
 }
+let capAskTo=0;
+$('capb').addEventListener('click',e=>{e.stopPropagation();ac();const b=$('capb');
+  if(!S||!S.running||S.over)return;
+  if(S.phase==='tut'){hint('Kapital gibt es ab der ersten Welle.',1.8);return;}
+  if(S.capInj>=CAP_MAX){hint('Alle drei Kapitalspritzen sind aufgebraucht.',1.8);return;}
+  if(!b.classList.contains('ask')){b.classList.add('ask');b.firstChild.nodeValue='Sicher? ';sound('tap');hint('Nochmal tippen: +'+CAP_INJ.eur+' Mio € · Netzentgelt +'+fmt(CAP_INJ.ne,1)+' ct · −'+CAP_INJ.pts+' Punkte',2.4);
+    clearTimeout(capAskTo);capAskTo=setTimeout(()=>{b.classList.remove('ask');b.firstChild.nodeValue='+ Kapital ';},2600);return;}
+  clearTimeout(capAskTo);b.classList.remove('ask');b.firstChild.nodeValue='+ Kapital ';takeCap();});
 function contWave(){
   if(S.phase!=='break')return;
   $('inter').hidden=true;S.wave=S.pendingWave;S.phase='wave';S.t=WAVES[S.wave].t0;S.next=S.t+1.2;
@@ -701,7 +744,7 @@ let comboEl=null,comboTimer=0;
 function showCombo(n){const box=$('toasts');if(comboEl)comboEl.remove();comboEl=document.createElement('div');comboEl.className='combo';comboEl.innerHTML=`<small>KOMBO</small><b>×${n}</b>`;box.appendChild(comboEl);clearTimeout(comboTimer);comboTimer=setTimeout(()=>{if(comboEl){comboEl.remove();comboEl=null;}},1800);}
 function banner(w){$('bsm').textContent='Welle '+(WAVES.indexOf(w)+1)+' von 3';$('bb').textContent=w.y;$('bs').textContent=w.name;const b=$('banner');b.classList.remove('show');void b.offsetWidth;b.classList.add('show');sound('wave');}
 function setTool(k){S.tool=S.tool===k?null:k;['trafo','uw'].forEach(t=>$('t-'+t).classList.toggle('on',S.tool===t));
-  if(S.phase==='tut'){hint('');if(S.tool)coach(S.tool==='uw'?'Jetzt <b>auf die Karte tippen</b> – dort, wo das neue Umspannwerk in der Nähe des Windparks stehen soll.':'Jetzt <b>auf ein Umspannwerk tippen</b>, das in Reichweite des Rechenzentrums liegt.','Einarbeitung '+(S.tutStep+1)+'/5');return;}
+  if(S.phase==='tut'){hint('');if(S.tool)coach(S.tool==='uw'?'<b>Tippe auf die Karte</b> – nahe beim Windpark.':'<b>Tippe auf ein Umspannwerk</b> in Reichweite.','Einarbeitung '+(S.tutStep+1)+'/'+TUT.length);return;}
   if(S.tool==='uw')hint('Tippe auf die Karte, wo das neue Umspannwerk stehen soll.');else if(S.tool)hint('Tippe auf ein Umspannwerk.');else hint('');}
 function shakeTool(k){const el=$('t-'+k);el.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:260});}
 ['trafo','uw'].forEach(k=>$('t-'+k).addEventListener('click',()=>{if(!S.running||S.phase==='break')return;if(!S.unlock[k]){shakeTool(k);return;}setTool(k);sound('tap');}));
@@ -766,32 +809,38 @@ function draw(dt){
   for(const [a,b,isNew] of S.links){const A=S.uws[a],B=S.uws[b];const [x1,y1]=P(A.x,A.y),[x2,y2]=P(B.x,B.y);cx.strokeStyle=isNew?'#B4A58C':C.grid;cx.lineWidth=2;if(isNew)cx.setLineDash([5,4]);cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke();cx.setLineDash([]);}
   // connections
   for(const p of S.ps){if(p.state!=='conn'&&!(p.state==='gone'&&p.uw!=null))continue;const u=S.uws[p.uw];if(!u)continue;const [x1,y1]=P(p.x,p.y),[x2,y2]=P(u.x,u.y),f=p.line;
-    cx.strokeStyle=TYPES[p.type].c;cx.lineWidth=3.2;if(p.res>0)cx.setLineDash([5,5]);cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x1+(x2-x1)*f,y1+(y2-y1)*f);cx.stroke();cx.setLineDash([]);}
+    const fd=connFade(p),ga=cx.globalAlpha;if(p.res>0)cx.setLineDash([5,5]);
+    if(fd<1){cx.globalAlpha=ga*(1-fd);cx.strokeStyle=TYPES[p.type].c;cx.lineWidth=3.2;cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x1+(x2-x1)*f,y1+(y2-y1)*f);cx.stroke();}
+    if(fd>0){cx.globalAlpha=ga*fd;cx.strokeStyle='#BFB3A0';cx.lineWidth=1.4;cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke();}
+    cx.globalAlpha=ga;cx.setLineDash([]);}
   // drag line
   const dg=S.drag;
   let target=null,verdict=null;
-  if(dg&&dg.p){const p=dg.p,[x1,y1]=P(p.x,p.y);target=nearestUW(dg.x,dg.y,34);if(target)verdict=tryConnect(p,target,true);
+  if(dg&&dg.p){const p=dg.p,[x1,y1]=P(p.x,p.y);target=snapUW(dg.x,dg.y,p);if(target)verdict=tryConnect(p,target,true);
     const [tx,ty]=target?P(target.x,target.y):[dg.x,dg.y];
     if(target&&!verdict.ok){cx.strokeStyle=C.bad;cx.lineWidth=1.6;cx.setLineDash([2,4]);}else{cx.strokeStyle=TYPES[p.type].c;cx.lineWidth=3.4;cx.setLineDash([7,5]);}
     cx.lineDashOffset=-T*30;cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(tx,ty);cx.stroke();cx.setLineDash([]);cx.lineDashOffset=0;
     // range circle
     cx.strokeStyle='rgba(43,42,40,.12)';cx.lineWidth=1;cx.setLineDash([3,4]);cx.beginPath();cx.arc(x1,y1,MAXD*k,0,6.283);cx.stroke();cx.setLineDash([]);}
   // UWs
+  const ur=UR();
   for(const u of S.uws){
-    const [x,y]=P(u.x,u.y),r=10+u.pop*3,f=u.used/u.cap,col=uwCol(f);
+    const [x,y]=P(u.x,u.y),r=ur+u.pop*3,f=u.used/u.cap,col=uwCol(f);
     const isTarget=target===u,toolT=tool&&tool!=='uw';
-    if(isTarget||toolT){cx.strokeStyle=isTarget?(verdict.ok?C.ok:C.bad):C.ink;cx.lineWidth=1.4;cx.setLineDash([3,3]);cx.lineDashOffset=-T*12;cx.beginPath();cx.arc(x,y,r+11+(toolT?Math.sin(T*5)*1.5:0),0,6.283);if(isTarget){cx.fillStyle=verdict.ok?'rgba(110,159,120,.14)':'rgba(210,96,78,.12)';cx.fill();}cx.stroke();cx.setLineDash([]);cx.lineDashOffset=0;}
-    if(f>.92&&!u.build){cx.fillStyle=`rgba(210,96,78,${.12+.06*Math.sin(T*4)})`;cx.beginPath();cx.arc(x,y,r+9,0,6.283);cx.fill();}
-    shadowOn();cx.fillStyle=C.card;cx.beginPath();cx.arc(x,y,r+3,0,6.283);cx.fill();shadowOff();
-    cx.strokeStyle='#E4DBCB';cx.lineWidth=3;cx.beginPath();cx.arc(x,y,r,0,6.283);cx.stroke();
-    if(u.isNew&&u.build>0){ring(x,y,r,1-u.build/u.buildMax,C.ink2,3);}
-    else ring(x,y,r,f,col,3);
-    cx.fillStyle=C.ink;cx.beginPath();cx.arc(x,y,3.2,0,6.283);cx.fill();
-    cx.font=`600 ${Math.max(8.5,Math.min(10.5,k*27))}px ${SANS}`;cx.fillStyle=C.ink2;cx.textAlign='center';cx.textBaseline='top';cx.fillText(u.name,x,y+r+5);
-    if(u.build>0){const lbl=u.isNew?'im Bau':'Trafo';cx.font=`700 8.5px ${SANS}`;const w=58;rr(cx,x+12,y-26,w,17,8.5);cx.fillStyle=C.card;cx.fill();cx.strokeStyle=C.line;cx.lineWidth=1;cx.stroke();
-      rr(cx,x+18,y-19,22,3,1.5);cx.fillStyle=C.line;cx.fill();rr(cx,x+18,y-19,22*(1-u.build/u.buildMax),3,1.5);cx.fillStyle=C.warn;cx.fill();cx.fillStyle=C.ink2;cx.textAlign='right';cx.textBaseline='middle';cx.fillText(lbl,x+12+w-6,y-17);}
-    if(isTarget){const below=dg.p.y<u.y;pill(x,below?y+r+30:y-r-24,verdict.why,verdict.ok?(verdict.saldo<-1.5?C.bad:verdict.saldo<0?C.warn:C.ok):C.bad,'#fff',`800 9.5px ${SANS}`);}
-    else if((dg&&dg.p&&Math.hypot(dg.p.x-u.x,dg.p.y-u.y)<=MAXD)||tool==='trafo'){const fr=Math.max(0,Math.round(freeCap(u))),fits=dg&&dg.p?fr>=dg.p.mw:true;pill(x,y-r-13,fr+' frei',C.card,fits?C.ok:C.muted,`800 8.5px ${SANS}`,C.line);}
+    if(isTarget||toolT){cx.strokeStyle=isTarget?(verdict.ok?C.ok:C.bad):C.ink;cx.lineWidth=1.6;cx.setLineDash([3,3]);cx.lineDashOffset=-T*12;cx.beginPath();cx.arc(x,y,r+9+(toolT?Math.sin(T*5)*1.5:0),0,6.283);if(isTarget){cx.fillStyle=verdict.ok?'rgba(110,159,120,.16)':'rgba(210,96,78,.12)';cx.fill();}cx.stroke();cx.setLineDash([]);cx.lineDashOffset=0;}
+    if(f>.92&&!u.build){cx.fillStyle=`rgba(210,96,78,${.12+.06*Math.sin(T*4)})`;cx.beginPath();cx.arc(x,y,r+7,0,6.283);cx.fill();}
+    shadowOn();cx.fillStyle=C.card;cx.beginPath();cx.arc(x,y,r+2,0,6.283);cx.fill();shadowOff();
+    cx.strokeStyle='#E4DBCB';cx.lineWidth=3.4;cx.beginPath();cx.arc(x,y,r,0,6.283);cx.stroke();
+    const bld=u.isNew&&u.build>0;
+    if(bld){ring(x,y,r,1-u.build/u.buildMax,C.ink2,3.4);}
+    else ring(x,y,r,f,col,3.4);
+    {const fr=Math.max(0,Math.round(freeCap(u))),s=bld?'…':String(fr);let tc=f>.92?'#A8432F':C.ink;
+     if(dg&&dg.p&&!bld&&Math.hypot(dg.p.x-u.x,dg.p.y-u.y)<=MAXD)tc=fr>=dg.p.mw?'#3E6B48':C.muted;
+     cx.font=`800 ${s.length>=4?r*.6:s.length===3?r*.74:r*.86}px ${SANS}`;cx.fillStyle=bld?C.muted:tc;cx.textAlign='center';cx.textBaseline='middle';cx.fillText(s,x,y+1);}
+    if(u.build>0){const lbl=u.isNew?'im Bau':'Trafo';cx.font=`700 9px ${SANS}`;const w=58,bx=x+r-2,by=y-r-12;rr(cx,bx,by,w,17,8.5);cx.fillStyle=C.card;cx.fill();cx.strokeStyle=C.line;cx.lineWidth=1;cx.stroke();
+      rr(cx,bx+6,by+7,20,3,1.5);cx.fillStyle=C.line;cx.fill();rr(cx,bx+6,by+7,20*(1-u.build/u.buildMax),3,1.5);cx.fillStyle=C.warn;cx.fill();cx.fillStyle=C.ink2;cx.textAlign='right';cx.textBaseline='middle';cx.fillText(lbl,bx+w-6,by+9);}
+    if(isTarget){const below=dg.p.y<u.y;pill(x,below?y+r+16:y-r-15,verdict.why,verdict.ok?(verdict.saldo<-1.5?C.bad:verdict.saldo<0?C.warn:C.ok):C.bad,'#fff',`800 10.5px ${SANS}`);}
+    else if(S.uwTap&&S.uwTap.u===u&&T-S.uwTap.t<2.4){const a=clamp((2.4-(T-S.uwTap.t))/.4,0,1);cx.globalAlpha=a;pill(x,y<60?y+r+16:y-r-15,u.name+' · '+fmt(u.cap)+' MW',C.ink,C.cream,`700 10.5px ${SANS}`);cx.globalAlpha=1;}
   }
   // petents
   for(const p of S.ps){
@@ -800,7 +849,10 @@ function draw(dt){
     const x=bx+sh+wig,y=by;
     const appear=p.state==='gone'?1:Math.min(1,(S.clk-p.born)*5);const sc=p.state==='gone'?1:(appear<1?.4+.6*easeBack(appear):1);
     cx.save();cx.globalAlpha=p.state==='gone'?Math.max(0,p.a):1;cx.translate(x,y-(p.state==='gone'&&p.gone==='exp'?(1-p.a)*14:0));cx.scale(sc,sc);
-    const r=conn?8.5:(p.type==='rz'?14:11);
+    const fd=connFade(p);
+    if(conn&&fd>=1){cx.fillStyle='#BFB3A0';cx.beginPath();cx.arc(0,0,4.5,0,6.283);cx.fill();cx.restore();continue;}
+    const r=conn?8.5:(p.type==='rz'?16:13);
+    if(conn&&fd>0){cx.globalAlpha=fd;cx.fillStyle='#BFB3A0';cx.beginPath();cx.arc(0,0,4.5,0,6.283);cx.fill();cx.globalAlpha=1-fd;}
     if(p.state==='wait'){const f=p.pat/p.patMax,R=r+5,col=f<.3?C.bad:f<.6?C.warn:C.ok;
       cx.strokeStyle='#DCD2C0';cx.lineWidth=3;cx.beginPath();cx.arc(0,0,R,0,6.283);cx.stroke();ring(0,0,R,f,col,3);
       if(S.sel===p||(dg&&dg.p===p)){cx.strokeStyle=T0.c;cx.lineWidth=1.2;cx.setLineDash([2,3]);cx.beginPath();cx.arc(0,0,r+13,0,6.283);cx.stroke();cx.setLineDash([]);}
@@ -809,15 +861,29 @@ function draw(dt){
     glyph(cx,p.type,0,0,r*1.25);
     if(p.nd&&p.state==='wait'){cx.fillStyle=C.card;cx.beginPath();cx.arc(r*.75,-r*.75,5.5,0,6.283);cx.fill();cx.fillStyle=C.ok;cx.font=`800 8px ${SANS}`;cx.textAlign='center';cx.textBaseline='middle';cx.fillText('n',r*.75,-r*.75+.5);}
     if(p.top&&p.state==='wait'){cx.fillStyle='#E7C77E';cx.strokeStyle=C.card;cx.lineWidth=1.5;cx.beginPath();cx.arc(-r*.75,-r*.75,6,0,6.283);cx.fill();cx.stroke();cx.fillStyle='#5E4512';cx.font=`800 8px ${SANS}`;cx.textAlign='center';cx.textBaseline='middle';cx.fillText('€',-r*.75,-r*.75+.5);}
-    if(p.state==='wait'){pill(0,r+14,p.mw+' MW',C.card,C.ink,`700 9px ${SANS}`,C.line);}
+    if(p.state==='wait'){cx.globalAlpha=1;pill(0,r+15,p.mw+' MW',C.card,C.ink,`800 10.5px ${SANS}`,C.line);
+      const age=S.clk-p.born,na=clamp(1-(age-(p.tut?4:1.8))/.5,0,1);
+      if(na>0&&!(dg&&dg.p===p)){cx.globalAlpha=na*.96;cx.font=`800 11.5px ${SANS}`;const w1=cx.measureText(p.name).width;cx.font=`700 9px ${SANS}`;const w2=cx.measureText(T0.n).width;
+        const bw=Math.max(w1,w2)+18,bh=32,up=by>70,yy=up?-(r+8+bh):r+26,dx=clamp(0,4+bw/2-x,W-4-bw/2-x);cx.translate(dx,0);
+        rr(cx,-bw/2,yy,bw,bh,9);cx.fillStyle=C.card;cx.fill();cx.strokeStyle=T0.c;cx.lineWidth=1.2;cx.stroke();
+        cx.textAlign='center';cx.textBaseline='middle';cx.fillStyle=C.ink2;cx.fillText(T0.n,0,yy+10);cx.font=`800 11.5px ${SANS}`;cx.fillStyle=C.ink;cx.fillText(p.name,0,yy+22);}
+    }
     cx.restore();
   }
+  // Einarbeitung: Hand zeigt die Ziehbewegung
+  if(S.phase==='tut'&&S.tutStep===0&&S.tutP&&S.tutP.state==='wait'&&!dg){const p=S.tutP;let best=null,bd=1e9;for(const u of S.uws){if(tryConnect(p,u,true).ok){const d=Math.hypot(u.x-p.x,u.y-p.y);if(d<bd){bd=d;best=u;}}}
+    if(best){const q=(T%2)/1.4;if(q<=1){const [x1,y1]=P(p.x,p.y),[x2,y2]=P(best.x,best.y),e=q<.5?2*q*q:1-Math.pow(-2*q+2,2)/2,hx=x1+(x2-x1)*e,hy=y1+(y2-y1)*e;
+      cx.globalAlpha=Math.min(1,Math.sin(Math.PI*q)*1.6)*.9;cx.strokeStyle=C.ink;cx.lineWidth=2;cx.setLineDash([4,4]);cx.beginPath();cx.moveTo(x1,y1);cx.lineTo(hx,hy);cx.stroke();cx.setLineDash([]);
+      cx.fillStyle='rgba(43,42,40,.22)';cx.beginPath();cx.arc(hx,hy,13,0,6.283);cx.fill();cx.fillStyle=C.ink;cx.beginPath();cx.arc(hx,hy,5,0,6.283);cx.fill();cx.globalAlpha=1;}}}
   // tool preview for new UW
   if(tool==='uw'&&S.hover){const [hx,hy]=S.hover,[mx,my]=toMap(hx,hy),ok=inside(mx,my)&&S.uws.every(u=>Math.hypot(u.x-mx,u.y-my)>=70);cx.strokeStyle=ok?C.ink:C.bad;cx.lineWidth=1.5;cx.setLineDash([3,3]);cx.beginPath();cx.arc(hx,hy,15,0,6.283);cx.stroke();cx.setLineDash([]);}
   // floating texts
   for(const f of S.fx){const [x,y]=P(f.x,f.y),q=f.t/f.life;cx.globalAlpha=q<.75?1:1-(q-.75)/.25;cx.font=`600 ${f.txt.includes('Mio €')&&!f.txt.startsWith('−')?15:11}px ${f.txt.includes('Mio €')&&!f.txt.startsWith('−')?SERIF:SANS}`;cx.fillStyle=f.col;cx.textAlign='center';cx.textBaseline='middle';cx.fillText(f.txt,x,y-q*22);cx.globalAlpha=1;}
 }
 const easeBack=t=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};
+function snapUW(px,py,p){let best=null,bs=1e9;const R0=Math.max(46,UR()*2.8);for(const u of S.uws){const [x,y]=P(u.x,u.y),d=Math.hypot(px-x,py-y);if(d>R0)continue;const s=d-(tryConnect(p,u,true).ok?22:0);if(s<bs){bs=s;best=u;}}return best;}
+const UR=()=>clamp(k*42,12,17);
+function connFade(p){if(p.state!=='conn'||p.cc==null)return 0;return clamp((S.clk-p.cc-1.6)/.6,0,1);}
 function nearestUW(px,py,rad){let best=null,bd=rad;for(const u of S.uws){const [x,y]=P(u.x,u.y),d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best=u;}}return best;}
 function nearestP(px,py,rad){let best=null,bd=rad;for(const p of S.ps){if(p.state!=='wait')continue;const [x,y]=P(p.x,p.y),d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best=p;}}return best;}
 
@@ -827,17 +893,18 @@ cv.addEventListener('pointerdown',e=>{
   const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;
   if(S.tool){
     if(S.tool==='uw'){useTool('uw',null,toMap(px,py));}
-    else{const u=nearestUW(px,py,30);if(u)useTool(S.tool,u);else setTool(null);}
+    else{const u=nearestUW(px,py,38);if(u)useTool(S.tool,u);else setTool(null);}
     return;
   }
-  const p=nearestP(px,py,30);
+  const p=nearestP(px,py,34);
   if(p){S.drag={p,x:px,y:py,sx:px,sy:py,moved:false};cv.setPointerCapture(e.pointerId);S.sel=p;return;}
   S.sel=null;
+  {const u=nearestUW(px,py,30);if(u){S.uwTap={u,t:T};sound('tap');}}
 });
 cv.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;S&&(S.hover=[px,py]);if(!S||!S.drag)return;S.drag.x=px;S.drag.y=py;if(Math.hypot(px-S.drag.sx,py-S.drag.sy)>8)S.drag.moved=true;});
 cv.addEventListener('pointerup',e=>{if(!S||!S.drag)return;const d=S.drag;S.drag=null;
   if(!d.moved){S.sel=d.p;return;}
-  const u=nearestUW(d.x,d.y,34);if(!u)return;const v=tryConnect(d.p,u);if(!v.ok)rejectDrop(d.p,v.why);});
+  const u=snapUW(d.x,d.y,d.p);if(!u)return;const v=tryConnect(d.p,u);if(!v.ok)rejectDrop(d.p,v.why);});
 cv.addEventListener('pointercancel',()=>{if(S)S.drag=null;});
 function rejectDrop(p,why){p.shake=.3;sound('bad');buzz([20,30,20]);
   if(why.startsWith('voll')||why.startsWith('nur'))hintOnce('full','Zu wenig freie Kapazität – anderes UW wählen oder Trafo ausbauen.',2.6);
@@ -851,14 +918,16 @@ function updCard(){
   let p=S.sel&&S.sel.state==='wait'?S.sel:null;
   if(!p){const w=S.ps.filter(q=>q.state==='wait').sort((a,b)=>a.pat-b.pat);p=w[0]||null;}
   if(!p){const key='empty';if(lastCard!==key){lastCard=key;el.className='pcard empty';el.innerHTML=S.running?(S.phase==='tut'?'Einarbeitung …':'Kurz durchatmen – der nächste Petent kommt gleich.'):'';}return;}
-  const T0=TYPES[p.type],key=p.id+'|'+Math.ceil(p.pat)+'|'+S.uws.length;
+  const T0=TYPES[p.type];
   let est=null;{const near=S.uws.filter(u=>!(u.isNew&&u.build>0)&&Math.hypot(u.x-p.x,u.y-p.y)<=MAXD).map(u=>connCost(p,u));if(near.length)est=Math.round((p.bkz-Math.min(...near))*10)/10;}
+  const key=p.id+'|'+est+'|'+S.uws.length;
   if(key===lastCard)return;lastCard=key;
   icx.clearRect(0,0,38,38);icx.fillStyle=T0.c;icx.beginPath();icx.arc(19,19,19,0,6.283);icx.fill();glyph(icx,p.type,19,19,24);
   el.className='pcard';
-  el.innerHTML=`<div class="ic"><img src="${icv.toDataURL()}" width="38" height="38" alt=""></div>
-  <div class="tx"><small>${p.top?'<span class="top">Top-Deal</span>':''}${T0.gen&&!p.tut?'<span class="vr">Vorrang · EEG</span>':''}${T0.n}${p.nd?' · netzdienlich':''}${p.tut?'':' · '+Math.ceil(p.pat)+' s'}</small><b>${p.name}</b>${p.cfl?`<span class="qt cf" style="color:${p.cf<1?'var(--ok)':'var(--bad)'}">${p.cfl} · Kosten ×${fmt(p.cf,1)}</span>`:`<span class="qt">„${p.q}“</span>`}</div>
-  <div class="rt"><b>${p.mw}<span> MW</span></b><small class="ec">${p.bkz>0?'BKZ '+fmt(p.bkz,1):(T0.gen?'Einspeiser · kein BKZ':'')}</small><small class="ec2${est!=null&&est<0?' neg':''}" style="color:${est==null?'var(--muted)':est>=0?'var(--ok)':'var(--bad)'}">${est==null?'kein UW in Reichweite':'Saldo ≈ '+sgnM(est)+' Mio €'}</small></div><button class="rej" type="button" title="Ablehnen" aria-label="Ablehnen"><svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>`;
+  const bd=(p.top?'<span class="bd t">Top-Deal</span>':'')+(T0.gen&&!p.tut?'<span class="bd">Vorrang EEG</span>':'')+(p.nd?'<span class="bd">netzdienlich</span>':'');
+  const sc=est==null?'<span style="color:var(--muted)">kein UW in Reichweite</span>':`<span style="color:${est>=0?'var(--ok)':'var(--bad)'}">Saldo ${sgnM(est)} Mio €</span>`;
+  el.innerHTML=`<div class="ic"><img src="${icv.toDataURL()}" width="34" height="34" alt=""></div>
+  <div class="tx"><b>${T0.n} · ${p.mw} MW</b><span class="sl">${bd}${sc}${p.cfl?` · <span style="color:${p.cf<1?'var(--ok)':'var(--bad)'}">${p.cfl}</span>`:''}</span></div><button class="rej" type="button" title="Ablehnen" aria-label="Ablehnen"><svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>`;
   el.querySelector('.rej').onclick=()=>{const q=S.ps.find(x=>x.id===p.id);reject(q);lastCard='';};
 }
 
@@ -868,7 +937,7 @@ function updHud(){
   $('year').textContent=S.phase==='tut'?'2025':w.y;$('wname').textContent=S.phase==='tut'?'Einarbeitung':w.name;
   $('wlabel').textContent=S.phase==='tut'?'Ohne Zeitdruck':'Welle '+(S.wave+1)+'/3 · '+mmss(WAVES[S.wave].t0+60-S.t);
   $('wbar').style.width=clamp((S.t-w.t0)/(wEnd-w.t0),0,1)*100+'%';
-  $('bval').textContent=(S.budget<0?'−':'')+fmt(Math.abs(Math.round(S.budget)))+' Mio €';$('budget').style.background=S.budget<0?'var(--bad)':'var(--ink)';
+  $('bval').textContent=(S.budget<0?'−':'')+fmt(Math.abs(Math.round(S.budget)))+' Mio';$('budget').style.background=S.budget<0?'var(--bad)':'var(--ink)';
   const ne=S.ne;$('ne').textContent=fmt(ne,2);
   const nd=S.neT-6.8;$('netr').textContent=nd>.15?'↑':nd<-.15?'↓':'';$('netr').style.color=nd>.15?'var(--warn)':'var(--ok)';
   $('nebar').style.width=clamp((ne-6)/4.5,0,1)*100+'%';$('nebar').style.background=ne<8?'var(--ok)':ne<9.5?'var(--warn)':'var(--bad)';
@@ -876,6 +945,9 @@ function updHud(){
   $('mw').textContent=fmt(S.mwTot);
   {const on=S.phase!=='tut'&&S.wave>=1&&!(S.phase==='break'&&S.pendingWave<=1);$('m-mw').classList.toggle('eeon',on);if(on){const g=EE.goal[S.wave>=2?2:1],e=eeMW();$('eev').textContent=fmt(e)+' / '+fmt(g);$('eebar').style.width=clamp(e/g,0,1)*100+'%';}}$('mwbar').style.width=clamp(S.mwTot/5000,0,1)*100+'%';$('mwbar').style.background='var(--ink)';
   ['trafo','uw'].forEach(t=>$('t-'+t).classList.toggle('no',S.budget<TOOLS[t].cost));
+  {const left=CAP_MAX-S.capInj,cb=$('capb');$('capn').textContent=left;cb.classList.toggle('none',left<=0||S.phase==='tut'||!S.running);
+   cb.classList.toggle('pulse',S.running&&S.phase==='wave'&&left>0&&S.budget<TOOLS.trafo.cost&&!cb.classList.contains('ask'));}
+  if(S.phase==='break'&&S.pendingWave!=null&&!$('inter').hidden)$('in-go').textContent='Weiter zu '+WAVES[S.pendingWave].y+' · '+Math.max(0,Math.ceil(S.autoT));
 }
 
 /* ---------- flow ---------- */
@@ -891,7 +963,10 @@ function rankFor(s){
   if(s>=2000)return 'Frisch eingearbeitet';
   return 'Praktikant:in im Anschlussmanagement';
 }
-function startGame(){reset();['start','end','join','wait','cd','inter'].forEach(id=>{const e=$(id);if(e)e.hidden=true;});S.running=true;lastCard='';$('toasts').innerHTML='';ac();
+let wake=null;
+async function requestWake(){try{if('wakeLock' in navigator&&!wake){wake=await navigator.wakeLock.request('screen');wake.addEventListener('release',()=>{wake=null;});}}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&S&&S.running)requestWake();});
+function startGame(){requestWake();reset();['start','end','join','wait','cd','inter'].forEach(id=>{const e=$(id);if(e)e.hidden=true;});S.running=true;lastCard='';$('toasts').innerHTML='';ac();
   ['trafo','uw'].forEach(t=>{$('t-'+t).classList.add('lock');$('t-'+t).classList.remove('pulse');});$('m-ne').classList.add('dim');}
 function finish(){
   if(!S.failed&&S.t>=DUR&&S.tutDone){evalGoal(1);evalGoal(2);}
