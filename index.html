@@ -1038,10 +1038,15 @@ if(ROOM&&!HOST){
     if(n.length<2){$('jerr').textContent='Bitte mindestens 2 Zeichen.';return;}
     myName=n.slice(0,16);try{localStorage.setItem('nr_name',myName);}catch(e){}
     $('jgo').disabled=true;$('jerr').textContent='';ac();
-    api('rooms/'+ROOM+'/players/'+PID,'PATCH',{name:myName,joined:SV,r:-1,score:0,done:false}).then(()=>{
-      joined=true;$('join').hidden=true;$('wait').hidden=false;$('wtitle').textContent='Du bist dabei, '+myName+'.';render();
+    api('rooms/'+ROOM+'/players/'+PID,'PATCH',{name:myName,joined:SV,seen:SV,r:-1,score:0,done:false}).then(()=>{
+      joined=true;$('join').hidden=true;$('wait').hidden=false;$('wtitle').textContent='Du bist dabei, '+myName+'.';render();beat();
     }).catch(()=>{$('jgo').disabled=false;$('jerr').textContent='Keine Verbindung zum Spielserver. Bitte WLAN/mobile Daten prüfen und nochmal tippen.';});
   };
+  // Lebenszeichen: alle 5 s, damit der Beamer nur Leute zeigt, die gerade wirklich da sind
+  function beat(){if(joined&&document.visibilityState==='visible')api('rooms/'+ROOM+'/players/'+PID,'PATCH',{name:myName,seen:SV}).catch(()=>{});}
+  setInterval(beat,5000);
+  document.addEventListener('visibilitychange',beat);
+  window.addEventListener('pagehide',()=>{if(joined&&!S.running){try{fetch(DB+'/rooms/'+ROOM+'/players/'+PID+'.json',{method:'DELETE',keepalive:true});}catch(e){}}});
   $('jgo').onclick=join;$('jname').addEventListener('keydown',e=>{if(e.key==='Enter')join();});
   $('again').style.display='none';$('home').style.display='none';
   function render(){
@@ -1092,20 +1097,29 @@ if(HOST){
   try{const q=qrcode(0,'M');q.addData(joinUrl);q.make();const n=q.getModuleCount(),c=document.createElement('canvas'),sz=8,pad=2;c.width=c.height=(n+pad*2)*sz;const g=c.getContext('2d');g.fillStyle='#FBF8F2';g.fillRect(0,0,c.width,c.height);g.fillStyle='#2B2A28';for(let r=0;r<n;r++)for(let k=0;k<n;k++)if(q.isDark(r,k))g.fillRect((k+pad)*sz,(r+pad)*sz,sz,sz);$('hqr').appendChild(c);}catch(e){$('hqr').textContent='QR nicht verfügbar';}
   let room={},view='',startedAt=0,autoDone=false,doneRound=-1,doneTab='pod',bOrder=[],bT=0;
   api('rooms/'+code,'GET').then(d=>{if(!d||!d.state)return api('rooms/'+code,'PATCH',{state:'lobby',round:0,seed:Math.floor(Math.random()*1e9),created:SV});}).catch(()=>{$('hbig').textContent='Keine Verbindung zur Datenbank';});
-  stream('rooms/'+code,d=>{room=d||{};render();});
-  const players=()=>Object.entries(room.players||{}).map(([id,p])=>({id,...p}));
+  stream('rooms/'+code,d=>{room=d||{};if(room.hostPing&&room.hostPing!==lastPing){lastPing=room.hostPing;srvOff=room.hostPing-Date.now();}render();});
+  const players=()=>Object.entries(room.players||{}).filter(([id,p])=>p&&p.name).map(([id,p])=>({id,...p}));
+  // Serverzeit schätzen: Beamer schreibt regelmäßig einen Zeitstempel und liest ihn zurück
+  let srvOff=0,lastPing=0;const srvNow=()=>Date.now()+srvOff;
+  const ping=()=>api('rooms/'+code,'PATCH',{hostPing:SV}).catch(()=>{});setInterval(ping,5000);setTimeout(ping,500);
+  const isLive=p=>p.seen&&srvNow()-p.seen<15000;
+  // In der Lobby: Einträge ohne Lebenszeichen (alte Tests, geschlossene Handys) aus der Datenbank löschen
+  setInterval(()=>{if((room.state||'lobby')!=='lobby')return;players().filter(p=>!p.seen||srvNow()-p.seen>30000).forEach(p=>api('rooms/'+code+'/players/'+p.id,'DELETE').catch(()=>{}));render();},5000);
   const main=$('hmain');
-  function startRound(){autoDone=false;startedAt=performance.now();api('rooms/'+code,'PATCH',{state:'running',round:(room.round||0)+1,seed:Math.floor(Math.random()*1e9),startedAt:SV});}
+  function startRound(){players().filter(p=>!isLive(p)).forEach(p=>api('rooms/'+code+'/players/'+p.id,'DELETE').catch(()=>{}));autoDone=false;startedAt=performance.now();api('rooms/'+code,'PATCH',{state:'running',round:(room.round||0)+1,seed:Math.floor(Math.random()*1e9),startedAt:SV});}
   function endRound(){api('rooms/'+code,'PATCH',{state:'done'});}
   function render(){
     const st=room.state||'lobby',ps=players();
     $('hjoin').style.display=st==='lobby'?'flex':'none';
     if(st==='lobby'){
+      const all=ps;ps.splice(0,ps.length,...all.filter(isLive));
       $('hstate').firstChild.nodeValue='Lobby';$('hbig').textContent=ps.length?ps.length+' im Raum':'Warte auf Mitspieler';
       if(view!=='lobby'){view='lobby';main.innerHTML=`<div class="h-lbl"><span>Scannen, Spitznamen eingeben, loslegen</span><span id="hcnt"></span></div><div class="h-chips" id="hchips"></div><div class="h-row"><button class="h-btn" id="hstart" type="button">Runde starten</button></div>`;$('hstart').onclick=startRound;}
       const chips=$('hchips'),have=new Set([...chips.children].map(c=>c.dataset.id));
       if(!ps.length&&!chips.children.length)chips.innerHTML='<div class="h-empty">Noch niemand da – scannt den QR-Code mit dem Handy.</div>';
       if(ps.length){chips.querySelector('.h-empty')?.remove();ps.sort((a,b)=>(a.joined||0)-(b.joined||0)).forEach(p=>{if(!have.has(p.id)){const s=document.createElement('span');s.dataset.id=p.id;s.textContent=p.name;chips.appendChild(s);}});}
+      {const live=new Set(ps.map(p=>p.id));[...chips.children].forEach(c=>{if(c.dataset.id&&!live.has(c.dataset.id))c.remove();});
+       if(!ps.length&&!chips.children.length)chips.innerHTML='<div class="h-empty">Noch niemand da – scannt den QR-Code mit dem Handy.</div>';}
       $('hstart').disabled=!ps.length;
     }
     else if(st==='running'){
